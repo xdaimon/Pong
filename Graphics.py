@@ -34,6 +34,22 @@ CENTER_HORIZONTAL = WINDOW_WIDTH//2
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
+FONT_HEIGHT = PADDLE_HEIGHT*1.8
+FONT_WIDTH = FONT_HEIGHT/1.8
+FONT_STROKE = PADDLE_WIDTH
+FONT_P1_X = CENTER_HORIZONTAL - FONT_WIDTH*3
+FONT_P2_X = CENTER_HORIZONTAL + FONT_WIDTH*2
+FONT_Y = 40
+
+
+def getP1Score(state):
+    return state[CURRENT_SCORE_INDX][0]
+
+
+def getP2Score(state):
+    return state[CURRENT_SCORE_INDX][1]
+
+
 def initGraphics():
     global window, fps
     pygame.init()
@@ -42,12 +58,133 @@ def initGraphics():
     fps = pygame.time.Clock()
     pass
 
+
 def drawBoard():
     # Center line
     pygame.draw.line(window, WHITE, [CENTER_HORIZONTAL, 0],[CENTER_HORIZONTAL, WINDOW_HEIGHT], 1)
     pass
 
+
+def rect(left, top, w, h):
+    pygame.draw.rect(window, WHITE, [[left, top],[w, h]], 0)
+    pass
+
+def rectDel(left, top, w, h):
+    pygame.draw.rect(window, BLACK, [[left, top],[w, h]], 0)
+    pass
+
+
+def drawZero(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left + FONT_STROKE, top + FONT_STROKE, FONT_WIDTH-FONT_STROKE*2, FONT_HEIGHT-FONT_STROKE*2)
+    pass
+
+
+def drawOne(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left, top, FONT_WIDTH-FONT_STROKE, FONT_HEIGHT)
+    pass
+
+
+def drawTwo(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left, top + FONT_STROKE, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    rectDel(left+FONT_STROKE, top + FONT_STROKE*4, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    pass
+
+
+def drawThree(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left, top + FONT_STROKE, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    rectDel(left, top + FONT_STROKE*4, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    pass
+
+
+def drawFour(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left+FONT_STROKE, top, FONT_WIDTH-FONT_STROKE*2, FONT_STROKE*3)
+    rectDel(left, top+FONT_STROKE*4, FONT_WIDTH-FONT_STROKE, FONT_STROKE*4)
+    pass
+
+
+def drawFive(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left+FONT_STROKE, top + FONT_STROKE, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    rectDel(left, top + FONT_STROKE*4, FONT_WIDTH-FONT_STROKE, FONT_STROKE*2)
+    pass
+
+
+def drawSix(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left+FONT_STROKE, top, FONT_WIDTH-FONT_STROKE, FONT_STROKE*3.3)
+    rectDel(left+FONT_STROKE, top + FONT_STROKE*4.3, FONT_WIDTH-FONT_STROKE*2, FONT_STROKE*2)
+    pass
+
+
+def drawSeven(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left, top+FONT_STROKE, FONT_WIDTH-FONT_STROKE, FONT_STROKE*7)
+    pass
+
+
+def drawEight(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left+FONT_STROKE, top+FONT_STROKE, FONT_WIDTH-FONT_STROKE*2, FONT_STROKE*1.8)
+    rectDel(left+FONT_STROKE, top+FONT_STROKE*3.7, FONT_WIDTH-FONT_STROKE*2, FONT_STROKE*2.7)
+    pass
+
+
+def drawNine(left, top):
+    rect(left, top, FONT_WIDTH, FONT_HEIGHT)
+    rectDel(left+FONT_STROKE, top+FONT_STROKE, FONT_WIDTH-FONT_STROKE*2, FONT_STROKE*2)
+    rectDel(left, top+FONT_STROKE*4, FONT_WIDTH-FONT_STROKE, FONT_STROKE*4)
+    pass
+
+
 def drawScores(state):
+    p1_score = getP1Score(state)
+    if p1_score == 0:
+        drawZero(FONT_P1_X, FONT_Y)
+    elif p1_score == 1:
+        drawOne(FONT_P1_X, FONT_Y)
+    elif p1_score == 2:
+        drawTwo(FONT_P1_X, FONT_Y)
+    elif p1_score == 3:
+        drawThree(FONT_P1_X, FONT_Y)
+    elif p1_score == 4:
+        drawFour(FONT_P1_X, FONT_Y)
+    elif p1_score == 5:
+        drawFive(FONT_P1_X, FONT_Y)
+    elif p1_score == 6:
+        drawSix(FONT_P1_X, FONT_Y)
+    elif p1_score == 7:
+        drawSeven(FONT_P1_X, FONT_Y)
+    elif p1_score == 8:
+        drawEight(FONT_P1_X, FONT_Y)
+    elif p1_score == 9:
+        drawNine(FONT_P1_X, FONT_Y)
+
+    p2_score = getP2Score(state)
+    if p2_score == 0:
+        drawZero(FONT_P2_X, FONT_Y)
+    elif p2_score == 1:
+        drawOne(FONT_P2_X, FONT_Y)
+    elif p2_score == 2:
+        drawTwo(FONT_P2_X, FONT_Y)
+    elif p2_score == 3:
+        drawThree(FONT_P2_X, FONT_Y)
+    elif p2_score == 4:
+        drawFour(FONT_P2_X, FONT_Y)
+    elif p2_score == 5:
+        drawFive(FONT_P2_X, FONT_Y)
+    elif p2_score == 6:
+        drawSix(FONT_P2_X, FONT_Y)
+    elif p2_score == 7:
+        drawSeven(FONT_P2_X, FONT_Y)
+    elif p2_score == 8:
+        drawEight(FONT_P2_X, FONT_Y)
+    elif p2_score == 9:
+        drawNine(FONT_P2_X, FONT_Y)
     pass
 
 def drawCenteredRect(center, width, height):
@@ -55,6 +192,7 @@ def drawCenteredRect(center, width, height):
     top = center[1] - height//2
     pygame.draw.rect(window, WHITE, pygame.Rect((left, top),(width, height)))
     pass
+
 
 def drawBall(state):
     """
@@ -66,6 +204,7 @@ def drawBall(state):
     height = BALL_RADIUS
     drawCenteredRect(center, width, height)
     pass
+
 
 def drawPaddles(state):
     """
@@ -102,6 +241,7 @@ def updateGraphics(state):
     fps.tick(60)
     pass
 
+
 def getPixelArray():
     """
     Returns a numpy array containing pixel values being either 0 or 1
@@ -109,3 +249,4 @@ def getPixelArray():
 
     # Just take all the red values, the agent only needs black and white images
     return surfarray.pixels3d(window)[:,:,0]
+

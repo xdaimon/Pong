@@ -345,12 +345,6 @@ def updatePaddles():
     p2_velocity = getP2Velocity()
     p2_input = getP2Input()
 
-    # If velocities changed we need to either zero them or negate them
-    # if p1_input != getP1PrevInput():
-    #     p1_velocity = vectorScalMul(p1_velocity, p1_input)
-    # if p2_input != getP2PrevInput():
-    #     p2_velocity = vectorScalMul(p2_velocity, p2_input)
-
     # Apply acceleration
     # Because window coords are silly we have to accel in the oppossite direction
     speed_increment = 0
