@@ -33,6 +33,7 @@ CENTER_HORIZONTAL = WINDOW_WIDTH//2
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
+GREEN = (24,69,59)
 
 FONT_HEIGHT = PADDLE_HEIGHT*1.8
 FONT_WIDTH = FONT_HEIGHT/1.8
@@ -61,16 +62,17 @@ def initGraphics():
 
 def drawBoard():
     # Center line
-    pygame.draw.line(window, WHITE, [CENTER_HORIZONTAL, 0],[CENTER_HORIZONTAL, WINDOW_HEIGHT], 1)
+    pygame.draw.line(window, BLACK, [CENTER_HORIZONTAL, 0],[CENTER_HORIZONTAL, WINDOW_HEIGHT], 1)
     pass
 
 
 def rect(left, top, w, h):
-    pygame.draw.rect(window, WHITE, [[left, top],[w, h]], 0)
+    pygame.draw.rect(window, BLACK, [[left, top],[w, h]], 0)
     pass
 
+
 def rectDel(left, top, w, h):
-    pygame.draw.rect(window, BLACK, [[left, top],[w, h]], 0)
+    pygame.draw.rect(window, WHITE, [[left, top],[w, h]], 0)
     pass
 
 
@@ -187,10 +189,11 @@ def drawScores(state):
         drawNine(FONT_P2_X, FONT_Y)
     pass
 
+
 def drawCenteredRect(center, width, height):
     left = center[0] - width//2
     top = center[1] - height//2
-    pygame.draw.rect(window, WHITE, pygame.Rect((left, top),(width, height)))
+    pygame.draw.rect(window, BLACK, pygame.Rect((left, top),(width, height)))
     pass
 
 
@@ -224,6 +227,7 @@ def drawPaddles(state):
     drawCenteredRect(center, width, height)
     pass
 
+
 def updateGraphics(state):
     """
     Takes game state and updates the graphics accordingly
@@ -231,7 +235,7 @@ def updateGraphics(state):
     """
 
     # Draw stuff
-    window.fill(BLACK)
+    window.fill(WHITE)
     drawBoard()
     drawBall(state)
     drawPaddles(state)

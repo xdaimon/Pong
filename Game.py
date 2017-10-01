@@ -42,11 +42,11 @@ BOARD_TOP_EDGE = (WINDOW_HEIGHT - BOARD_HEIGHT)//2
 BOARD_BOTTOM_EDGE = BOARD_TOP_EDGE + BOARD_HEIGHT
 
 # Pause for two second after each score
-PAUSE_DURATION = 0
+PAUSE_DURATION = 500
 
 # Per second speeds
 SECOND_TO_FRAME = 1/60
-BALL_INIT_SPEED = WINDOW_WIDTH/2
+BALL_INIT_SPEED = WINDOW_WIDTH/1.5
 PADDLE_MAX_SPEED = WINDOW_WIDTH/50
 PADDLE_BASE_SPEED = WINDOW_WIDTH/80
 PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)
@@ -314,6 +314,8 @@ def updateBall():
     if rect1.colliderect(rect2):
         vel = getBallVelocity()
         vel = [-vel[0], vel[1]]
+        # Add a bit of randomness for show
+        vel[1] += (random.random()*2.-1.)*.8
         setBallVelocity(vel)
         # Move the ball away from the paddle a bit
         pos = vectorAdd(pos, [4,0])
@@ -321,7 +323,10 @@ def updateBall():
     rect2 = pyRectForCenterAndSize(getP2Position(), (PADDLE_WIDTH, PADDLE_HEIGHT))
     if rect1.colliderect(rect2):
         vel = getBallVelocity()
-        setBallVelocity([-vel[0], vel[1]])
+        vel = [-vel[0], vel[1]]
+        # Add a bit of randomness for show
+        vel[1] += (random.random()*2.-1.)*.6
+        setBallVelocity(vel)
         pos = vectorAdd(pos, [-4,0])
 
     # Check for ball/wall collisions
@@ -415,6 +420,16 @@ def updatePlayState():
         theta = math.pi/4 * (rand*2-1) + math.pi
         if rand > .5:
             theta += math.pi
+        while (math.pi/3 < abs(theta) < math.pi/2.4):
+            rand = random.random()
+            theta = math.pi/3 * (rand*2-1) + math.pi
+            if rand > .5:
+                theta += math.pi
+        while (math.pi + math.pi/3 < abs(theta) < math.pi/2.4 + math.pi):
+            rand = random.random()
+            theta = math.pi/3 * (rand*2-1) + math.pi
+            theta += math.pi
+
         new_vel = directionForTheta(theta)
         new_vel = vectorScalMul(new_vel, SECOND_TO_FRAME*BALL_INIT_SPEED)
         setBallVelocity(new_vel)
