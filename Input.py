@@ -27,4 +27,7 @@ def getInput():
             keyUp(event)
         elif event.type == pygame.QUIT:
             sys.exit()
+
+    # TODO return dummy until I know how to use pygame
+    return 0
     pass

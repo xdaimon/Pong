@@ -1,3 +1,5 @@
+import math
+
 # State list accessors
 PLAYER_INPUT_INDX = 0
 BALL_VELOCITY_INDX = 1
@@ -38,25 +40,31 @@ BOARD_BOTTOM_EDGE = BOARD_TOP_EDGE + BOARD_HEIGHT
 # Pause for two second after each score
 PAUSE_DURATION = 2000
 
+# Per second speed
+BALL_INIT_SPEED = WINDOW_WIDTH//4
+VELOCITY_TO_DELTA = 1/60
+
 state = []
 
 """
 Details/Notes
 
+Rect positions.
 Let the position of the paddles be at the center point of the paddle
 Same for the ball
 
-Timers. I will need a timer to create a short pause after each score.
+Timers.
+I will need a timer to create a short pause after each score.
 During this pause the game will be in SCORE_STATE where the ball is stationary
 at the center of the screen.
 So I will need to set the timer in the state list to be a millisecond value. I
 will watch for when a certain amount of time has passed relative to the
 millisecond value in the state list.
+
+Velocities.
+Velocity variables in state are deltas to be used to update positions per frame
+(assuming 60fps)
 """
-
-def resetStateList():
-    pass
-
 
 def initGame():
     """
@@ -85,6 +93,12 @@ def initGame():
     pass
 
 
+def resetStateList():
+    state = []
+    initGame()
+    pass
+
+
 def setInputs(players_input):
     """
     players_input is a list of n ints that indicate which action the nth player
@@ -98,53 +112,97 @@ def setInputs(players_input):
     players_input[n] == 1
 
     """
+    state[PLAYER_INPUT_INDX] = players_input
     pass
 
 
+def directionForTheta(theta):
+    return [math.cos(theta), math.sin(theta)]
+
+
+def vectorAdd(v1, v2):
+    return [v1[0] + v2[0], v1[1] + v2[1]]
+
+
+def vectorSub(v1, v2):
+    return [v1[0] - v2[0], v1[1] - v2[1]]
+
+
+def vectorScalMul(v, s):
+    return [v1[0] * s, v2[1] * s]
+
+
+def checkCollision(rect1, rect2):
+    """
+    rect1 == (centerx,centery,width,height)
+    rect2 is like rect1
+    """
+    pass
+
+
+def setCurrentState(new_state):
+    state[CURRENT_STATE_INDX] = new_state
+
+
+def getCurrentState():
+    return state[CURRENT_STATE_INDX]
+
+
+def setBallVelocity(new_vel):
+    state[BALL_VELOCITY_INDX] = new_vel
+
+
 def updatePlayState():
+    print("in play state")
+    # Update velocities
+    # Update positions
+    # Check for collisions
+    # If collisions, then change velocities
+    # Check if ball entered score zone
+    # If ball entered score zone, then enter score_state
     pass
 
 
 def updateScoreState():
+    print("in score state")
+    # if entering state
+    #     reset ball to center
+    #     update scores
+    #     check end game
+    #     if end game
+    #         enter end_state
+    #     else
+    #         start score pause timer
+    # elif score pause timer
+    #     launch ball
+    #     enter play_state
     pass
 
 
 def updateEndState():
-    pass
+    print("in end state")
+    p1_input = state[PLAYER_INPUT_INDX][0]
+    if p1_input != 0:
+        resetStateList()
+        setCurrentState(PLAY_STATE)
+        new_vel = directionForTheta(2*math.pi*random.random())
+        vectorScalMul(new_vel, BALL_INIT_SPEED)
+        setBallVelocity(new_vel)
 
+    pass
 
 def updateState():
 
-    # if in play_state
-    #     Update velocities
-    #     Update positions
-    #     Check for collisions
-    #     If collisions, then change velocities
-    #     Check if ball entered score zone
-    #     If ball entered score zone, then enter score_state
-    # elif in score_state
-    #     if entering state
-    #         reset ball to center
-    #         update scores
-    #         check end game
-    #         if end game
-    #             enter end_state
-    #         else
-    #             start score pause timer
-    #     elif score pause timer
-    #         launch ball
-    #         enter play_state
-    # elif in end_state
-    #     if user is moving paddle
-    #         resetStateList()
-    #         set ball initial velocity
-    #         enter play_state
-    #
+    if getCurrentState() == PLAY_STATE:
+        updatePlayState()
+    elif getCurrentState() == SCORE_STATE:
+        updateScoreState()
+    elif getCurrentState() == END_STATE:
+        updateEndState()
 
     pass
 
 
 def getState():
     return state
-
 

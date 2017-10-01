@@ -9,7 +9,7 @@ Game.initGame()
 
 while True:
     # Update Game
-    Game.setInputs(Input.getInput())
+    Game.setInputs([Input.getInput(), Agent.getAction()])
     Game.updateState()
 
     # Update Graphics
