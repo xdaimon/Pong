@@ -50,11 +50,15 @@ def drawScores(state):
 
 def drawBall(state):
     """
-    Draws a square centered at the ball's coordinates
+    Draws a square with edge length BALL_RADIUS centered at the ball's coordinates
     """
-    # not actually a ball
-    # pygame.draw.box(window, WHITE, CENTER_POINT, 20, 0)
-    pygame.draw.rect(window, WHITE, state[BALL_POSITION_INDX], width=0)
+
+    center = state[BALL_POSITION_INDX]
+    width = BALL_RADIUS
+    height = BALL_RADIUS
+    left = center[0] - width//2
+    top = center[1] - height//2
+    pygame.draw.rect(window, WHITE, pygame.Rect((left, top),(width, height)))
     pass
 
 def drawPaddles(state):
