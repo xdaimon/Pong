@@ -5,6 +5,7 @@ import Input
 
 # Initialize stuff
 Graphics.initGraphics()
+Game.initGame()
 
 while True:
     Graphics.updateGraphics(None)
