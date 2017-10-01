@@ -9,4 +9,6 @@ or
 python3.5 pong.py
 
 
+Use the left and right arrow keys to move your paddle. Have fun :)
+
 
