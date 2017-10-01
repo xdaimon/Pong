@@ -35,9 +35,7 @@ def getAction(state):
     elif ball_y < agent_y - PADDLE_HEIGHT//2:
         action = 1
 
-    if random.random() < .2:
-        action = 0
-    if ball_x < WINDOW_WIDTH//5:
+    if random.random() < .1:
         action = 0
 
     return action
