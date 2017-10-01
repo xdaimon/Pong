@@ -1,4 +1,5 @@
 import math
+import random
 
 # State list accessors
 PLAYER_INPUT_INDX = 0
@@ -129,7 +130,7 @@ def vectorSub(v1, v2):
 
 
 def vectorScalMul(v, s):
-    return [v1[0] * s, v2[1] * s]
+    return [v[0] * s, v[1] * s]
 
 
 def checkCollision(rect1, rect2):

@@ -1,18 +1,45 @@
 import pygame, sys
 
+"""
+Returns these values
+
+-1 : move left
+ 0 : stop
+ 1 : move right
+"""
+
+LEFT = -1
+STOP = 0
+RIGHT = 1
+
+previous_input = STOP
+
 def keyDown(e):
     """
     Switch through movement keys to see which is pressed
     """
-    pass
+    if e.key == pygame.K_UP:
+        return RIGHT
+    elif e.key == pygame.K_DOWN:
+        return LEFT
+    else:
+        return previous_input
+
 
 def keyUp(e):
     """
     Switch through movement keys to see which is released
     """
-    pass
+    if e.key == pygame.K_UP:
+        return STOP
+    elif e.key == pygame.K_DOWN:
+        return STOP
+    else:
+        return previous_input
+
 
 def getInput():
+    global previous_input
     """
     Return int representing input for human player
 
@@ -22,12 +49,10 @@ def getInput():
     """
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
-            keyDown(event)
+            previous_input = keyDown(event)
         elif event.type == pygame.KEYUP:
-            keyUp(event)
+            previous_input = keyUp(event)
         elif event.type == pygame.QUIT:
             sys.exit()
 
-    # TODO return dummy until I know how to use pygame
-    return 0
-    pass
+    return previous_input
