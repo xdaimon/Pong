@@ -21,10 +21,10 @@ def getInput():
      1 : move right
     """
     for event in pygame.event.get():
-        if event.type == pygame.key.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             keyDown(event)
-        elif event.type == pygame.key.KEYUP:
+        elif event.type == pygame.KEYUP:
             keyUp(event)
-        elif event.type == pygame.key.QUIT:
+        elif event.type == pygame.QUIT:
             sys.exit()
     pass
