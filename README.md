@@ -1,0 +1,1 @@
+This app will simulate a game of pong and then feed the game's pixels into a machine learning algorithm.
