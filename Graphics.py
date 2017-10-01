@@ -12,8 +12,8 @@ window = None
 PLAYER_INPUT_INDX = 0
 BALL_VELOCITY_INDX = 1
 BALL_POSITION_INDX = 2
-PADDLE_POSITION_INDX = 3
-PADDLE_VELOCITY_INDX = 4
+PADDLE_VELOCITY_INDX = 3
+PADDLE_POSITION_INDX = 4
 SCORE_PAUSE_TIMER_INDX = 5
 CURRENT_STATE_INDX = 6
 CURRENT_SCORE_INDX = 7
@@ -48,6 +48,12 @@ def drawBoard():
 def drawScores(state):
     pass
 
+def drawCenteredRect(center, width, height):
+    left = center[0] - width//2
+    top = center[1] - height//2
+    pygame.draw.rect(window, WHITE, pygame.Rect((left, top),(width, height)))
+    pass
+
 def drawBall(state):
     """
     Draws a square with edge length BALL_RADIUS centered at the ball's coordinates
@@ -56,15 +62,25 @@ def drawBall(state):
     center = state[BALL_POSITION_INDX]
     width = BALL_RADIUS
     height = BALL_RADIUS
-    left = center[0] - width//2
-    top = center[1] - height//2
-    pygame.draw.rect(window, WHITE, pygame.Rect((left, top),(width, height)))
+    drawCenteredRect(center, width, height)
     pass
 
 def drawPaddles(state):
     """
     Draws a rectangle centered at the paddle's coordinates
     """
+
+    # Player 1's paddle
+    center = state[PADDLE_POSITION_INDX][0]
+    width = PADDLE_WIDTH
+    height = PADDLE_HEIGHT
+    drawCenteredRect(center, width, height)
+
+    # Player 2's paddle
+    center = state[PADDLE_POSITION_INDX][1]
+    width = PADDLE_WIDTH
+    height = PADDLE_HEIGHT
+    drawCenteredRect(center, width, height)
     pass
 
 def updateGraphics(state):
@@ -75,8 +91,9 @@ def updateGraphics(state):
 
     # Draw stuff
     window.fill(BLACK)
-    drawBall(state)
     drawBoard()
+    drawBall(state)
+    drawPaddles(state)
 
     pygame.display.update()
     fps.tick(60)

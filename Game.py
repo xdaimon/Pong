@@ -2,8 +2,8 @@
 PLAYER_INPUT_INDX = 0
 BALL_VELOCITY_INDX = 1
 BALL_POSITION_INDX = 2
-PADDLE_POSITION_INDX = 3
-PADDLE_VELOCITY_INDX = 4
+PADDLE_VELOCITY_INDX = 3
+PADDLE_POSITION_INDX = 4
 SCORE_PAUSE_TIMER_INDX = 5
 CURRENT_STATE_INDX = 6
 CURRENT_SCORE_INDX = 7
@@ -75,7 +75,7 @@ def initGame():
     # paddle velocities, no paddle movements
     state.append([[0,0],[0,0]])
     # paddle positions
-    state.append([[BOARD_LEFT_EDGE,CENTER_VERTICAL], [BOARD_RIGHT_EDGE, CENTER_VERTICAL]])
+    state.append([[BOARD_LEFT_EDGE, CENTER_VERTICAL], [BOARD_RIGHT_EDGE, CENTER_VERTICAL]])
     # score pause timer, inital value is arbitrary
     state.append(0)
     # initial state, so that any user input starts the game
