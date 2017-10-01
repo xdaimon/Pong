@@ -42,7 +42,7 @@ BOARD_TOP_EDGE = (WINDOW_HEIGHT - BOARD_HEIGHT)//2
 BOARD_BOTTOM_EDGE = BOARD_TOP_EDGE + BOARD_HEIGHT
 
 # Pause for two second after each score
-PAUSE_DURATION = 200
+PAUSE_DURATION = 0
 
 # Per second speeds
 SECOND_TO_FRAME = 1/60
@@ -51,7 +51,7 @@ PADDLE_MAX_SPEED = WINDOW_WIDTH/50
 PADDLE_BASE_SPEED = WINDOW_WIDTH/80
 PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)
 
-MAX_SCORE = 2
+MAX_SCORE = 9
 
 
 state = []
@@ -346,16 +346,36 @@ def updatePaddles():
     p2_input = getP2Input()
 
     # If velocities changed we need to either zero them or negate them
-    if p1_input != getP1PrevInput():
-        p1_velocity = vectorScalMul(p1_velocity, p1_input)
-    if p2_input != getP2PrevInput():
-        p2_velocity = vectorScalMul(p2_velocity, p2_input)
+    # if p1_input != getP1PrevInput():
+    #     p1_velocity = vectorScalMul(p1_velocity, p1_input)
+    # if p2_input != getP2PrevInput():
+    #     p2_velocity = vectorScalMul(p2_velocity, p2_input)
 
     # Apply acceleration
     # Because window coords are silly we have to accel in the oppossite direction
-    speed_increment = -p1_input * PADDLE_ACCEL * SECOND_TO_FRAME
+    speed_increment = 0
+    if p1_input > 0:
+        speed_increment = -PADDLE_ACCEL * SECOND_TO_FRAME
+        if p1_velocity[1] > 0:
+            p1_velocity[1] *= -1
+    elif p1_input < 0:
+        speed_increment = PADDLE_ACCEL * SECOND_TO_FRAME
+        if p1_velocity[1] < 0:
+            p1_velocity[1] *= -1
+    else:
+        p1_velocity = [0,0]
     p1_velocity[1] += p1_velocity[1]+speed_increment
-    speed_increment = -p2_input * PADDLE_ACCEL * SECOND_TO_FRAME
+    speed_increment = 0
+    if p2_input > 0:
+        speed_increment = -PADDLE_ACCEL * SECOND_TO_FRAME
+        if p2_velocity[1] > 0:
+            p2_velocity[1] *= -1
+    elif p2_input < 0:
+        speed_increment = PADDLE_ACCEL * SECOND_TO_FRAME
+        if p2_velocity[1] < 0:
+            p2_velocity[1] *= -1
+    else:
+        p2_velocity = [0,0]
     p2_velocity[1] += p2_velocity[1]+speed_increment
 
     # Clamp velocities to max speeds
