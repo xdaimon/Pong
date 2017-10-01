@@ -19,12 +19,12 @@ END_STATE = 0
 PLAY_STATE = 1
 SCORE_STATE = 2
 
-PADDLE_WIDTH = 10
-PADDLE_HEIGHT = 40
+PADDLE_WIDTH = 20
+PADDLE_HEIGHT = 80
 BALL_RADIUS = PADDLE_WIDTH
 
-WINDOW_WIDTH = 600
-WINDOW_HEIGHT = 400
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 800
 
 CENTER_POINT = [WINDOW_WIDTH//2, WINDOW_HEIGHT//2]
 CENTER_VERTICAL = WINDOW_HEIGHT//2
@@ -46,7 +46,7 @@ PAUSE_DURATION = 500
 
 # Per second speeds
 SECOND_TO_FRAME = 1/60
-BALL_INIT_SPEED = WINDOW_WIDTH/1.5
+BALL_INIT_SPEED = WINDOW_WIDTH/2
 PADDLE_MAX_SPEED = WINDOW_WIDTH/50
 PADDLE_BASE_SPEED = WINDOW_WIDTH/80
 PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)
@@ -315,7 +315,7 @@ def updateBall():
         vel = getBallVelocity()
         vel = [-vel[0], vel[1]]
         # Add a bit of randomness for show
-        vel[1] += (random.random()*2.-1.)*.8
+        vel[1] += (random.random()*2.-1.)*2
         setBallVelocity(vel)
         # Move the ball away from the paddle a bit
         pos = vectorAdd(pos, [4,0])
@@ -325,7 +325,7 @@ def updateBall():
         vel = getBallVelocity()
         vel = [-vel[0], vel[1]]
         # Add a bit of randomness for show
-        vel[1] += (random.random()*2.-1.)*.6
+        vel[1] += (random.random()*2.-1.)*2
         setBallVelocity(vel)
         pos = vectorAdd(pos, [-4,0])
 
