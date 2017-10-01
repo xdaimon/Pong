@@ -105,6 +105,4 @@ def getPixelArray():
     """
 
     # Just take all the red values, the agent only needs black and white images
-    # arr = surfarray.pixels3d(window)[:,:,0]
-
-    pass
+    return surfarray.pixels3d(window)[:,:,0]

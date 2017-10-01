@@ -1,5 +1,5 @@
-import Graphics
 import Game
+import Graphics
 import Agent
 import Input
 
