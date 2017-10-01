@@ -10,13 +10,14 @@ window = None
 
 # State list accessors
 PLAYER_INPUT_INDX = 0
-BALL_VELOCITY_INDX = 1
-BALL_POSITION_INDX = 2
-PADDLE_VELOCITY_INDX = 3
-PADDLE_POSITION_INDX = 4
-SCORE_PAUSE_TIMER_INDX = 5
-CURRENT_STATE_INDX = 6
-CURRENT_SCORE_INDX = 7
+PLAYER_PREV_INPUT_INDX = 1
+BALL_VELOCITY_INDX = 2
+BALL_POSITION_INDX = 3
+PADDLE_VELOCITY_INDX = 4
+PADDLE_POSITION_INDX = 5
+SCORE_PAUSE_TIMER_INDX = 6
+CURRENT_STATE_INDX = 7
+CURRENT_SCORE_INDX = 8
 
 PADDLE_WIDTH = 10
 PADDLE_HEIGHT = 40
@@ -94,6 +95,7 @@ def updateGraphics(state):
     drawBoard()
     drawBall(state)
     drawPaddles(state)
+    drawScores(state)
 
     pygame.display.update()
     fps.tick(60)

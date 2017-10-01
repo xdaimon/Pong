@@ -3,13 +3,14 @@ import random
 
 # State list accessors
 PLAYER_INPUT_INDX = 0
-BALL_VELOCITY_INDX = 1
-BALL_POSITION_INDX = 2
-PADDLE_VELOCITY_INDX = 3
-PADDLE_POSITION_INDX = 4
-SCORE_PAUSE_TIMER_INDX = 5
-CURRENT_STATE_INDX = 6
-CURRENT_SCORE_INDX = 7
+PLAYER_PREV_INPUT_INDX = 1
+BALL_VELOCITY_INDX = 2
+BALL_POSITION_INDX = 3
+PADDLE_VELOCITY_INDX = 4
+PADDLE_POSITION_INDX = 5
+SCORE_PAUSE_TIMER_INDX = 6
+CURRENT_STATE_INDX = 7
+CURRENT_SCORE_INDX = 8
 
 # game states
 END_STATE = 0
@@ -41,9 +42,13 @@ BOARD_BOTTOM_EDGE = BOARD_TOP_EDGE + BOARD_HEIGHT
 # Pause for two second after each score
 PAUSE_DURATION = 2000
 
-# Per second speed
-BALL_INIT_SPEED = WINDOW_WIDTH//4
-VELOCITY_TO_DELTA = 1/60
+# Per second speeds
+SECOND_TO_FRAME = 1/60
+BALL_INIT_SPEED = WINDOW_WIDTH/4
+PADDLE_MAX_SPEED = BALL_INIT_SPEED/8
+PADDLE_BASE_SPEED = BALL_INIT_SPEED/16
+PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)/.8
+
 
 state = []
 
@@ -65,6 +70,14 @@ millisecond value in the state list.
 Velocities.
 Velocity variables in state are deltas to be used to update positions per frame
 (assuming 60fps)
+
+Paddle Movements
+Paddles move at PADDLE_BASE_SPEED
+but they also accellerate in each frame up until PADDLE_MAX_SPEED
+I imagine that a linear interpolation will work fine
+Paddles accelerate at a constant (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED) per 800 ms
+Paddles deaccelerate instantly, so if player input is zero (i.e. STOP) then the
+paddles velocity is set to zero
 """
 
 def initGame():
@@ -76,6 +89,8 @@ def initGame():
     # Must append in this order to preserve INDX constant's correctness
 
     # player input, no paddle movements
+    state.append([0,0])
+    # player prev input, no paddle movements
     state.append([0,0])
     # ball velocity, initially stationary
     state.append([0,0])
@@ -97,7 +112,10 @@ def initGame():
 def resetStateList():
     state = []
     initGame()
-    pass
+
+
+def setPrevInputs(new):
+    state[PLAYER_PREV_INPUT_INDX] = new
 
 
 def setInputs(players_input):
@@ -133,6 +151,29 @@ def vectorScalMul(v, s):
     return [v[0] * s, v[1] * s]
 
 
+def vectorClamp(v, vmin, vmax):
+    if v[0] < vmin[0]:
+        v[0] = vmin[0]
+    if v[1] < vmin[1]:
+        v[1] = vmin[1]
+    if v[0] > vmax[0]:
+        v[0] = vmax[0]
+    if v[1] > vmax[1]:
+        v[1] = vmax[1]
+    return v
+
+
+def vectorLength(v):
+    return math.sqrt(v[0]*v[0] + v[1]*v[1])
+
+
+def vectorMagClamp(v, speed_max):
+    vlength = vectorLength(v)
+    if vlength > speed_max:
+        v = vectorScalMul(v, speed_max/vlength)
+    return v
+
+
 def checkCollision(rect1, rect2):
     """
     rect1 == (centerx,centery,width,height)
@@ -141,33 +182,134 @@ def checkCollision(rect1, rect2):
     pass
 
 
-def setCurrentState(new_state):
-    state[CURRENT_STATE_INDX] = new_state
+def getP1PrevInput():
+    return state[PLAYER_PREV_INPUT_INDX][0]
+
+
+def getP2PrevInput():
+    return state[PLAYER_PREV_INPUT_INDX][1]
+
+
+def setCurrentState(new):
+    state[CURRENT_STATE_INDX] = new
 
 
 def getCurrentState():
     return state[CURRENT_STATE_INDX]
 
 
-def setBallVelocity(new_vel):
-    state[BALL_VELOCITY_INDX] = new_vel
+def setBallVelocity(new):
+    state[BALL_VELOCITY_INDX] = new
+
+
+def setP1Velocity(new):
+    state[PADDLE_VELOCITY_INDX][0] = new
+
+
+def setP2Velocity(new):
+    state[PADDLE_VELOCITY_INDX][1] = new
+
+
+def setP1Position(new):
+    state[PADDLE_POSITION_INDX][0] = new
+
+
+def setP2Position(new):
+    state[PADDLE_POSITION_INDX][1] = new
+
+
+def getP1Input():
+    return state[PLAYER_INPUT_INDX][0]
+
+
+def getP2Input():
+    return state[PLAYER_INPUT_INDX][1]
+
+
+def getP1Velocity():
+    return state[PADDLE_VELOCITY_INDX][0]
+
+
+def getP2Velocity():
+    return state[PADDLE_VELOCITY_INDX][1]
+
+
+def getP1Position():
+    return state[PADDLE_POSITION_INDX][0]
+
+
+def getP2Position():
+    return state[PADDLE_POSITION_INDX][1]
+
+
+def updatePaddles():
+
+    p1_velocity = getP1Velocity()
+    p1_input = getP1Input()
+    # Is the identity, stops, or negates vel direction cooresponding to user input
+    p2_velocity = getP2Velocity()
+    p2_input = getP2Input()
+
+    # If velocities changed we need to either zero them or negate them
+    if p1_input != getP1PrevInput():
+        p1_velocity = vectorScalMul(p1_velocity, p1_input)
+    if p2_input != getP2PrevInput():
+        p2_velocity = vectorScalMul(p2_velocity, p2_input)
+
+    # Apply acceleration
+    # Because window coords are silly we have to accel in the oppossite direction
+    speed_increment = -p1_input * PADDLE_ACCEL * SECOND_TO_FRAME
+    p1_velocity[1] += p1_velocity[1]+speed_increment
+    speed_increment = -p2_input * PADDLE_ACCEL * SECOND_TO_FRAME
+    p2_velocity[1] += p2_velocity[1]+speed_increment
+
+    # Clamp velocities to max speeds
+    p1_velocity = vectorMagClamp(p1_velocity, PADDLE_MAX_SPEED)
+    p2_velocity = vectorMagClamp(p2_velocity, PADDLE_MAX_SPEED)
+
+    # Update positions for velocities
+    p1_position = getP1Position()
+    # p1_velocity = vectorScalMul(p1_velocity, SECOND_TO_FRAME)
+    p1_position = vectorAdd(p1_position, p1_velocity)
+    p2_position = getP2Position()
+    p2_velocity = vectorScalMul(p2_velocity, SECOND_TO_FRAME)
+    p2_position = vectorAdd(p2_position, p2_velocity)
+
+    # Clamp positions
+    # remember that window coords are silly
+    miny = BOARD_TOP_EDGE
+    maxy = BOARD_BOTTOM_EDGE
+    minx = BOARD_LEFT_EDGE
+    maxx = BOARD_RIGHT_EDGE
+    p1_position = vectorClamp(p1_position, [minx, miny], [maxx, maxy])
+    p2_position = vectorClamp(p2_position, [minx, miny], [maxx, maxy])
+
+    setP1Position(p1_position)
+    setP2Position(p2_position)
+    setP1Velocity(p1_velocity)
+    setP2Velocity(p2_velocity)
+
+    setPrevInputs([p1_input, p2_input])
 
 
 def updatePlayState():
-    print("in play state")
-    # Update velocities
-    # Update positions
-    # Check for collisions
-    # If collisions, then change velocities
+    # print("in play state")
+
+    # Update paddle velocities for inputs
+    updatePaddles()
+    # Check for ball/paddle collisions
+    # If collisions, then change ball velocity
     # Check if ball entered score zone
     # If ball entered score zone, then enter score_state
+
     pass
 
 
 def updateScoreState():
     print("in score state")
-    # if entering state
+    # if entering score_state
     #     reset ball to center
+    #     set ball velocity to zero
     #     update scores
     #     check end game
     #     if end game
@@ -181,7 +323,8 @@ def updateScoreState():
 
 
 def updateEndState():
-    print("in end state")
+    # print("in end state")
+
     p1_input = state[PLAYER_INPUT_INDX][0]
     if p1_input != 0:
         resetStateList()
