@@ -1,5 +1,6 @@
 import math
 import random
+import pygame
 
 # State list accessors
 PLAYER_INPUT_INDX = 0
@@ -10,7 +11,8 @@ PADDLE_VELOCITY_INDX = 4
 PADDLE_POSITION_INDX = 5
 SCORE_PAUSE_TIMER_INDX = 6
 CURRENT_STATE_INDX = 7
-CURRENT_SCORE_INDX = 8
+STATE_SWITCHED_INDX = 8
+CURRENT_SCORE_INDX = 9
 
 # game states
 END_STATE = 0
@@ -40,14 +42,16 @@ BOARD_TOP_EDGE = (WINDOW_HEIGHT - BOARD_HEIGHT)//2
 BOARD_BOTTOM_EDGE = BOARD_TOP_EDGE + BOARD_HEIGHT
 
 # Pause for two second after each score
-PAUSE_DURATION = 2000
+PAUSE_DURATION = 200
 
 # Per second speeds
 SECOND_TO_FRAME = 1/60
-BALL_INIT_SPEED = WINDOW_WIDTH/4
-PADDLE_MAX_SPEED = BALL_INIT_SPEED/8
-PADDLE_BASE_SPEED = BALL_INIT_SPEED/16
-PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)/.8
+BALL_INIT_SPEED = WINDOW_WIDTH/2
+PADDLE_MAX_SPEED = WINDOW_WIDTH/50
+PADDLE_BASE_SPEED = WINDOW_WIDTH/80
+PADDLE_ACCEL = (PADDLE_MAX_SPEED-PADDLE_BASE_SPEED)
+
+MAX_SCORE = 2
 
 
 state = []
@@ -104,13 +108,14 @@ def initGame():
     state.append(0)
     # initial state, so that any user input starts the game
     state.append(END_STATE)
+    # did we just switch states?
+    state.append(False)
     # player's score
     state.append([0,0])
-    pass
 
 
 def resetStateList():
-    state = []
+    del state[:]
     initGame()
 
 
@@ -137,6 +142,10 @@ def setInputs(players_input):
 
 def directionForTheta(theta):
     return [math.cos(theta), math.sin(theta)]
+
+
+def vectorDot(v1, v2):
+    return v1[0]*v2[0] + v1[1]*v2[1]
 
 
 def vectorAdd(v1, v2):
@@ -174,12 +183,12 @@ def vectorMagClamp(v, speed_max):
     return v
 
 
-def checkCollision(rect1, rect2):
-    """
-    rect1 == (centerx,centery,width,height)
-    rect2 is like rect1
-    """
-    pass
+def getStateSwitched():
+    return state[STATE_SWITCHED_INDX]
+
+
+def setStateSwitched(new):
+    state[STATE_SWITCHED_INDX] = new
 
 
 def getP1PrevInput():
@@ -191,6 +200,7 @@ def getP2PrevInput():
 
 
 def setCurrentState(new):
+    setStateSwitched(True)
     state[CURRENT_STATE_INDX] = new
 
 
@@ -242,6 +252,91 @@ def getP2Position():
     return state[PADDLE_POSITION_INDX][1]
 
 
+def getBallVelocity():
+    return state[BALL_VELOCITY_INDX]
+
+
+def getBallPosition():
+    return state[BALL_POSITION_INDX]
+
+
+def setBallPosition(new):
+    state[BALL_POSITION_INDX] = new
+
+
+def incrementP1Score():
+    state[CURRENT_SCORE_INDX][0] += 1
+
+
+def incrementP2Score():
+    state[CURRENT_SCORE_INDX][1] += 1
+
+
+def getP1Score():
+    return state[CURRENT_SCORE_INDX][0]
+
+
+def getP2Score():
+    return state[CURRENT_SCORE_INDX][1]
+
+
+def setPausedTime(new):
+    state[SCORE_PAUSE_TIMER_INDX] = new
+
+
+def getPausedTime():
+    return state[SCORE_PAUSE_TIMER_INDX]
+
+
+def pyRectForCenterAndSize(c, s):
+    top = c[1] - s[1]/2
+    left = c[0] - s[0]/2
+    return pygame.Rect([ (left, top), s ])
+
+
+# TODO the paddle changes the velocity of the ball
+
+
+def updateBall():
+    vel = getBallVelocity()
+    pos = getBallPosition()
+    pos = vectorAdd(pos, vel)
+    miny = 0
+    maxy = WINDOW_HEIGHT
+    minx = 0
+    maxx = WINDOW_WIDTH
+    pos = vectorClamp(pos, [minx, miny], [maxx, maxy])
+
+    # Check for ball/paddle collisions
+    rect1 = pyRectForCenterAndSize(pos, (BALL_RADIUS,BALL_RADIUS))
+    rect2 = pyRectForCenterAndSize(getP1Position(), (PADDLE_WIDTH, PADDLE_HEIGHT))
+    # If collision, then change ball velocity
+    if rect1.colliderect(rect2):
+        vel = getBallVelocity()
+        vel = [-vel[0], vel[1]]
+        setBallVelocity(vel)
+        # Move the ball away from the paddle a bit
+        pos = vectorAdd(pos, [4,0])
+
+    rect2 = pyRectForCenterAndSize(getP2Position(), (PADDLE_WIDTH, PADDLE_HEIGHT))
+    if rect1.colliderect(rect2):
+        vel = getBallVelocity()
+        setBallVelocity([-vel[0], vel[1]])
+        pos = vectorAdd(pos, [-4,0])
+
+    # Check for ball/wall collisions
+    if pos[1] == 0 or pos[1] == WINDOW_HEIGHT:
+        vel = getBallVelocity()
+        setBallVelocity([vel[0], -vel[1]])
+
+    # Check if ball entered score zone
+    # If ball entered score zone, then enter score_state
+    if didScore(pos[0]):
+        setCurrentState(SCORE_STATE)
+
+    setBallPosition(pos)
+
+
 def updatePaddles():
 
     p1_velocity = getP1Velocity()
@@ -269,10 +364,8 @@ def updatePaddles():
 
     # Update positions for velocities
     p1_position = getP1Position()
-    # p1_velocity = vectorScalMul(p1_velocity, SECOND_TO_FRAME)
     p1_position = vectorAdd(p1_position, p1_velocity)
     p2_position = getP2Position()
-    p2_velocity = vectorScalMul(p2_velocity, SECOND_TO_FRAME)
     p2_position = vectorAdd(p2_position, p2_velocity)
 
     # Clamp positions
@@ -292,59 +385,74 @@ def updatePaddles():
     setPrevInputs([p1_input, p2_input])
 
 
+def didScore(x):
+    if x < 0.1:
+        return True
+    elif x > WINDOW_WIDTH-.1:
+        return True
+    return False
+
+
 def updatePlayState():
-    # print("in play state")
+    if getStateSwitched():
+        print("PlayState")
+        # restrict theta to +-pi/4 or pi +- pi/4
+        rand = random.random()
+        theta = math.pi/4 * (rand*2-1) + math.pi
+        if rand > .5:
+            theta += math.pi
+        new_vel = directionForTheta(theta)
+        new_vel = vectorScalMul(new_vel, SECOND_TO_FRAME*BALL_INIT_SPEED)
+        setBallVelocity(new_vel)
+        setStateSwitched(False)
 
-    # Update paddle velocities for inputs
     updatePaddles()
-    # Check for ball/paddle collisions
-    # If collisions, then change ball velocity
-    # Check if ball entered score zone
-    # If ball entered score zone, then enter score_state
-
-    pass
+    updateBall()
 
 
 def updateScoreState():
-    print("in score state")
-    # if entering score_state
-    #     reset ball to center
-    #     set ball velocity to zero
-    #     update scores
-    #     check end game
-    #     if end game
-    #         enter end_state
-    #     else
-    #         start score pause timer
-    # elif score pause timer
-    #     launch ball
-    #     enter play_state
-    pass
+    if getStateSwitched():
+        print("ScoreState")
+        pos = getBallPosition()
+        if pos[0] < WINDOW_WIDTH//2:
+            # Score agains P1
+            incrementP2Score()
+        else:
+            # Score agains P2
+            incrementP1Score()
+        setBallPosition(CENTER_POINT)
+        setBallVelocity([0,0])
+        if getP1Score() == MAX_SCORE or getP2Score() == MAX_SCORE:
+            setCurrentState(END_STATE)
+        else:
+            setPausedTime(pygame.time.get_ticks())
+            setStateSwitched(False)
+        print(getP1Score(), " ", getP2Score())
+    elif pygame.time.get_ticks() - getPausedTime() > PAUSE_DURATION:
+        setCurrentState(PLAY_STATE)
+
+    # We still let the user move the paddles
+    updatePaddles()
 
 
 def updateEndState():
-    # print("in end state")
-
-    p1_input = state[PLAYER_INPUT_INDX][0]
-    if p1_input != 0:
+    if getStateSwitched():
+        print("EndState")
         resetStateList()
-        setCurrentState(PLAY_STATE)
-        new_vel = directionForTheta(2*math.pi*random.random())
-        vectorScalMul(new_vel, BALL_INIT_SPEED)
-        setBallVelocity(new_vel)
+        setStateSwitched(False)
 
-    pass
+    p1_input = getP1Input()
+    if p1_input != 0:
+        setCurrentState(PLAY_STATE)
+
 
 def updateState():
-
     if getCurrentState() == PLAY_STATE:
         updatePlayState()
     elif getCurrentState() == SCORE_STATE:
         updateScoreState()
     elif getCurrentState() == END_STATE:
         updateEndState()
-
-    pass
 
 
 def getState():
