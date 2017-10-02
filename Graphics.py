@@ -236,13 +236,12 @@ def updateGraphics(state):
     # Draw stuff
     window.fill(WHITE)
     drawBoard()
-    drawBall(state)
     drawPaddles(state)
     drawScores(state)
+    drawBall(state)
 
     pygame.display.update()
     fps.tick(60)
-    pass
 
 
 def getPixelArray():
@@ -251,5 +250,5 @@ def getPixelArray():
     """
 
     # Just take all the red values, the agent only needs black and white images
-    return surfarray.pixels3d(window)[:,:,0]
+    return surfarray.pixels3d(window)[:,:,0] // 255
 
