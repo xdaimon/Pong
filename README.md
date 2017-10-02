@@ -1,4 +1,6 @@
-This app will simulate a game of pong and then feed the game's pixels into a machine learning algorithm.
+This app is a pong clone which was built to generate pixel data to feed into a machine learning algorithm (Reinforcement Learning).
+I wrote the code at GrizzHacks 2017 which is a hackathon in Michigan USA, it was quite a lot of fun.
+
 
 To play just
 
