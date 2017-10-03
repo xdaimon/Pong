@@ -3,7 +3,6 @@ import Graphics
 import Agent
 import Input
 
-# Initialize stuff
 Graphics.initGraphics()
 Game.initGame()
 
